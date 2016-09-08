@@ -7,7 +7,16 @@ use Illuminate\Database\Eloquent\Collection;
 
 abstract class BaseSeeder extends Seeder
 {
+
+    // si no se define la cantidad de registras a crear para una entidad,
+    // se crearan 50 registros por defecto
+    protected $total = 50;
     protected static $pool = array();
+
+    public function run()
+    {
+        $this->createMultiple($this->total);
+    }
 
     protected function createMultiple($total, array $customValues = array() )
     {
