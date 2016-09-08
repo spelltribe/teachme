@@ -7,7 +7,6 @@ Use Faker\Factory as Faker;
 abstract class BaseSeeder extends Seeder
 {
 
-    
 
     protected function createMultiple($total, array $customValues = array() )
     {
@@ -27,8 +26,14 @@ abstract class BaseSeeder extends Seeder
 
         $values = $this->getDummyData(Faker::create(),$customValues);
         $values = array_merge($values,$customValues);
-        $this->getModel()->create($values);
+        return $this->getModel()->create($values);
 
+    }
+
+    protected function createFrom($seeder, array $customValues = array())
+    {
+        $seeder = new $seeder;
+        return $seeder->create($customValues);
     }
 
     
