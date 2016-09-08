@@ -3,10 +3,11 @@
 use Illuminate\Database\Seeder;
 use Faker\Generator;
 Use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Collection;
 
 abstract class BaseSeeder extends Seeder
 {
-
+    protected static $pool = array();
 
     protected function createMultiple($total, array $customValues = array() )
     {
@@ -26,7 +27,8 @@ abstract class BaseSeeder extends Seeder
 
         $values = $this->getDummyData(Faker::create(),$customValues);
         $values = array_merge($values,$customValues);
-        return $this->getModel()->create($values);
+        //return $this->getModel()->create($values);
+        return $this->addToPool($this->getModel()->create($values));
 
     }
 
@@ -36,5 +38,28 @@ abstract class BaseSeeder extends Seeder
         return $seeder->create($customValues);
     }
 
+    protected function getRandom($model)
+    {
+        if (! isset (static::$pool[$model]))
+        {
+            throw new Exception("The $model collection does not exist");
+            
+        }
+
+        return static::$pool[$model]->random();
+    }
     
+    private function addToPool($entity)
+    {
+        $reflection = new ReflectionClass($entity);
+        $class = $reflection->getShortName();
+
+        if ( ! isset(static::$pool[$class]))
+        {
+            static::$pool[$class] = new Collection();
+        }
+
+        static::$pool[$class]->add($entity);
+        return $entity;
+    }
 }
